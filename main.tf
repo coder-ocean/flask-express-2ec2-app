@@ -2,16 +2,16 @@
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
   tags = {
-   Name = "flask-express-vpc"
+    Name = "flask-express-vpc"
   }
 }
 
 # Public subnet
 resource "aws_subnet" "public" {
-  vpc_id = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
-  availability_zone = "${var.region}a"
+  availability_zone       = "${var.region}a"
 }
 
 # Internet Gateway
@@ -29,7 +29,7 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route_table_association" "a" {
-  subnet_id = aws_subnet.public.id
+  subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
 
@@ -40,9 +40,9 @@ resource "aws_security_group" "flask_sg" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port   = var.flask_port
-    to_port     = var.flask_port
-    protocol    = "tcp"
+    from_port       = var.flask_port
+    to_port         = var.flask_port
+    protocol        = "tcp"
     security_groups = [aws_security_group.express_sg.id] # Express can talk to Flask
   }
 
@@ -77,22 +77,22 @@ resource "aws_security_group" "express_sg" {
 
 # Flask EC2
 resource "aws_instance" "flask" {
-  ami           = "ami-019715e0d74f695be"
-  instance_type = var.instance_type
-  key_name      = var.key_name
-  subnet_id     = aws_subnet.public.id
-  security_groups = [aws_security_group.flask_sg.name]
-  user_data = file("flask_userdata.sh")
+  ami                         = "ami-019715e0d74f695be"
+  instance_type               = var.instance_type
+  key_name                    = var.key_name
+  subnet_id                   = aws_subnet.public.id
+  security_groups             = [aws_security_group.flask_sg.name]
+  user_data                   = file("flask_userdata.sh")
   associate_public_ip_address = true
 }
 
 # Express EC2
 resource "aws_instance" "express" {
-  ami           = "ami-019715e0d74f695be"
-  instance_type = var.instance_type
-  key_name      = var.key_name
-  subnet_id     = aws_subnet.public.id
-  security_groups = [aws_security_group.express_sg.name]
-  user_data = file("express_userdata.sh")
+  ami                         = "ami-019715e0d74f695be"
+  instance_type               = var.instance_type
+  key_name                    = var.key_name
+  subnet_id                   = aws_subnet.public.id
+  security_groups             = [aws_security_group.express_sg.name]
+  user_data                   = file("express_userdata.sh")
   associate_public_ip_address = true
 }
