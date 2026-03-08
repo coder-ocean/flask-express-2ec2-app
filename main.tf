@@ -98,6 +98,10 @@ resource "aws_instance" "flask" {
   ami                         = "ami-019715e0d74f695be"
   instance_type               = var.instance_type
   key_name                    = var.key_name
+  tags = {
+    Name        = "Flask-Server"
+    description = "Flask server deployed through terraform"
+  }
   subnet_id                   = aws_subnet.public.id
   vpc_security_group_ids      = [aws_security_group.flask_sg.id]
   user_data                   = file("flask_userdata.sh")
@@ -109,6 +113,10 @@ resource "aws_instance" "express" {
   ami                         = "ami-019715e0d74f695be"
   instance_type               = var.instance_type
   key_name                    = var.key_name
+  tags = {
+    Name        = "Express-Server"
+    description = "Express server deployed through terraform"
+  }
   subnet_id                   = aws_subnet.public.id
   vpc_security_group_ids      = [aws_security_group.express_sg.id]
   user_data                   = file("express_userdata.sh")
