@@ -1,0 +1,26 @@
+services:
+
+ backend:
+  build: backend
+  hostname: backend-host
+  ports:
+    - "5000:5000"
+  networks: 
+    - ares-network
+
+ frontend:
+  build: frontend
+  hostname: frontend-host
+  environment:
+    - BACKEND_URL=http://backend-host:5000/api
+  ports:
+    - "3000:3000"
+  depends_on:
+    - backend
+  networks:
+    - ares-network
+
+networks:
+  ares-network: {}
+
+
