@@ -40,10 +40,19 @@ resource "aws_security_group" "flask_sg" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port       = var.flask_port
-    to_port         = var.flask_port
-    protocol        = "tcp"
-    security_groups = [aws_security_group.express_sg.id] # Express can talk to Flask
+    description = "HTTP from anywhere"
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "SSH from anywhere"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -61,10 +70,19 @@ resource "aws_security_group" "express_sg" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port   = var.express_port
-    to_port     = var.express_port
+    description = "HTTP from anywhere"
+    from_port   = 3000
+    to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # public access
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "SSH from anywhere"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -81,7 +99,7 @@ resource "aws_instance" "flask" {
   instance_type               = var.instance_type
   key_name                    = var.key_name
   subnet_id                   = aws_subnet.public.id
-  security_groups             = [aws_security_group.flask_sg.name]
+  vpc_security_group_ids      = [aws_security_group.flask_sg.id]
   user_data                   = file("flask_userdata.sh")
   associate_public_ip_address = true
 }
@@ -92,7 +110,7 @@ resource "aws_instance" "express" {
   instance_type               = var.instance_type
   key_name                    = var.key_name
   subnet_id                   = aws_subnet.public.id
-  security_groups             = [aws_security_group.express_sg.name]
+  vpc_security_group_ids      = [aws_security_group.express_sg.id]
   user_data                   = file("express_userdata.sh")
   associate_public_ip_address = true
 }

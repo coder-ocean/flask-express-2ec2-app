@@ -17,11 +17,3 @@ variable "access_key" {
 variable "secret_key" {
 
 }
-
-variable "flask_port" {
-  default = 5000
-}
-
-variable "express_port" {
-  default = 3000
-}
